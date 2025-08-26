@@ -1,6 +1,7 @@
-import bycrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModal.js';
+import transporter from '../config/nodemailer.js';
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -22,7 +23,7 @@ export const register = async (req, res) => {
     await user.save();
 
     //Generate Token using jwt
-    const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
     //Generate Cookie
     res.cookie('token', token, {
@@ -31,6 +32,17 @@ export const register = async (req, res) => {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       maxAge: 1 * 24 * 60 * 60 * 1000
     })
+
+    
+    //Sending Welcome Email using nodemailer
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: 'Welcome! to Charles Dev',
+      text: `Welcome to Charles Dev website, Your account has been created with email id: ${email}`
+    }
+
+    await transporter.sendMail(mailOptions);
 
     return res.json({ success: true })
 
@@ -42,21 +54,20 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email, !password) {
+  if (!email || !password) {
     return res.json({ success: false, message: "Email and Password are required" })
   }
 
   try {
 
     const user = await userModel.findOne({ email });
-    const password = await bycrypt.compare(password, user.password)
 
-    if (!user || !password) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.json({ success: false, message: "Invalid User or Password" })
     }
 
     //Generate Token using jwt
-    const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
     //Generate Cookie
     res.cookie('token', token, {
@@ -65,6 +76,8 @@ export const login = async (req, res) => {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       maxAge: 1 * 24 * 60 * 60 * 1000
     })
+
+
 
     return res.json({ success: true })
 
@@ -76,14 +89,14 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie('token',{
+    res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
     })
 
-    return res.json({success:true, message:"Logged Out"})
-    
+    return res.json({ success: true, message: "Logged Out" })
+
   } catch (error) {
     return res.json({ success: true, message: error.message })
   }
