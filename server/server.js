@@ -14,12 +14,15 @@ app.use(express.json())
 app.use(cookieParser());
 app.use(cors({credentials: true}));
 
-// API ROUTES / ENDPOINT
-app.use('/api/auth', authRouter)
 
 app.get('/', (req,res) => {
   res.send('API IS WORKawdawdING')
 })
+
+
+// API ROUTES / ENDPOINT
+app.use('/api/auth', authRouter)
+
 
 
 app.listen(port, ()=> console.log("Server Started on Port:", port))
