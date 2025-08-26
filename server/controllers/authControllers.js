@@ -1,4 +1,4 @@
-import bycrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModal.js';
 
@@ -22,7 +22,7 @@ export const register = async (req, res) => {
     await user.save();
 
     //Generate Token using jwt
-    const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
     //Generate Cookie
     res.cookie('token', token, {
@@ -42,21 +42,20 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email, !password) {
+  if (!email || !password) {
     return res.json({ success: false, message: "Email and Password are required" })
   }
 
   try {
 
     const user = await userModel.findOne({ email });
-    const password = await bycrypt.compare(password, user.password)
 
-    if (!user || !password) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.json({ success: false, message: "Invalid User or Password" })
     }
 
     //Generate Token using jwt
-    const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
     //Generate Cookie
     res.cookie('token', token, {
@@ -83,7 +82,7 @@ export const logout = async (req, res) => {
     })
 
     return res.json({success:true, message:"Logged Out"})
-    
+
   } catch (error) {
     return res.json({ success: true, message: error.message })
   }
