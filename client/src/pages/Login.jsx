@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext';
@@ -8,7 +8,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const { backendUrl, setIsLoggedIn, getUserData } = useContext(AppContext)
+  const { backendUrl, setIsLoggedIn, getUserData, isLoggedin } = useContext(AppContext)
 
   const [state, setState] = useState('Login')
   const [name, setName] = useState('')
@@ -47,7 +47,11 @@ const Login = () => {
     }
   }
 
-
+  useEffect(()=>{
+    if(isLoggedin){
+      navigate('/')
+    }
+  },[isLoggedin])
 
 
   return (

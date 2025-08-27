@@ -7,6 +7,8 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) =>{
 
+  axios.defaults.withCredentials=true;
+
   const navigate = useNavigate();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedin, setIsLoggedIn] = useState(false);
@@ -20,10 +22,10 @@ const AppContextProvider = (props) =>{
         getUserData()
       }else{
         toast.error(data.message)
-        navigate('/login')
       }
     }catch(error){
       toast.error(error.message)
+      
     }
   }
 
@@ -49,7 +51,7 @@ const AppContextProvider = (props) =>{
   }
 
   useEffect(()=>{
-    getAuthState()
+      getAuthState()
   },[])
 
   return(
