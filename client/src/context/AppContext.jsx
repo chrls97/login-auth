@@ -50,9 +50,9 @@ const AppContextProvider = (props) =>{
     getUserData
   }
 
-  useEffect(()=>{
-      getAuthState()
-  },[])
+  // useEffect(()=>{
+  //     getAuthState()
+  // },[])
 
   return(
     <AppContext.Provider value={value} >
