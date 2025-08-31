@@ -35,6 +35,7 @@ const Navbar = () => {
         setUserData(false)
         navigate('/login')
         toast.success(data.message)
+        localStorage.removeItem("token");
       }
     } catch (error) {
       toast.error(error.message)

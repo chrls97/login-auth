@@ -20,8 +20,13 @@ const AppContextProvider = (props) =>{
       if(data.success){
         setIsLoggedIn(true)
         getUserData()
+        navigate('/')
       }else{
-        toast.error(data.message)
+        if(window.location.pathname === 'login'){
+          toast.error(data.message)
+          navigate('/login')
+        }
+        
       }
     }catch(error){
       toast.error(error.message)
@@ -50,9 +55,9 @@ const AppContextProvider = (props) =>{
     getUserData
   }
 
-  // useEffect(()=>{
-  //     getAuthState()
-  // },[])
+  useEffect(()=>{
+      getAuthState()
+  },[])
 
   return(
     <AppContext.Provider value={value} >

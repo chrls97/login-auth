@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModal.js';
 import transporter from '../config/nodemailer.js';
+import { EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE } from '../config/emailTemplates.js'
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -129,7 +130,8 @@ export const sendVerifyOtp = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: 'Account Verification OTP',
-      text: `Your OTP is ${otp}. Verify your account using this OTP.`
+      //text: `Your OTP is ${otp}. Verify your account using this OTP.`,
+      html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
     }
 
     await transporter.sendMail(mailOptions);
@@ -221,7 +223,8 @@ export const sendResetOtp = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: 'Password Reset OTP',
-      text: `Your OTP for resetting your password is ${otp}. Use this OTP to proceed with resetting your password.`
+      //text: `Your OTP for resetting your password is ${otp}. Use this OTP to proceed with resetting your password.`
+      html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
     }
 
     // send email
@@ -245,18 +248,18 @@ export const resetPassword = async (req, res) => {
 
   try {
 
-    const user = await userModel.findOne({email});
+    const user = await userModel.findOne({ email });
 
-    if(!user){
-      return res.status(404).json({success:false, message:"User not found!"})
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found!" })
     }
 
-    if(user.resetOtp === '' || user.resetOtp !== otp){
-      return res.status(400).json({success:false, message:"Invalid OTP, Please check your OTP Again"})
+    if (user.resetOtp === '' || user.resetOtp !== otp) {
+      return res.status(400).json({ success: false, message: "Invalid OTP, Please check your OTP Again" })
     }
 
-    if(user.resetOtpExpAt <  Date.now()){
-      return res.status(400).json({success:false, message:"Your OTP has been expired, kindly reset your password again"})
+    if (user.resetOtpExpAt < Date.now()) {
+      return res.status(400).json({ success: false, message: "Your OTP has been expired, kindly reset your password again" })
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10)
@@ -267,10 +270,10 @@ export const resetPassword = async (req, res) => {
 
     await user.save()
 
-    res.status(200).json({success:false, message:"Passsword has been reset successfully"})
+    res.status(200).json({ success: false, message: "Passsword has been reset successfully" })
 
 
   } catch (error) {
-    res.status(500).json({success:false, message:error.message})
+    res.status(500).json({ success: false, message: error.message })
   }
 }

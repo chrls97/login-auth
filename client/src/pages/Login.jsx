@@ -47,11 +47,6 @@ const Login = () => {
     }
   }
 
-  useEffect(()=>{
-    if(isLoggedin){
-      navigate('/')
-    }
-  },[isLoggedin])
 
 
   return (
