@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT  || 4000;
 connectDb()
 
-const allowedOrigins = process.env.FRONTEND_URL || ['http://localhost:5173']
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ['http://localhost:5173']
 
 app.use(express.json())
 app.use(cookieParser());
@@ -18,7 +18,7 @@ app.use(cors({origin: allowedOrigins, credentials: true}));
 
 
 app.get('/', (req,res) => {
-  res.send('API IS WORKawdawdING')
+  res.send('API IS WORKING')
 })
 
 
