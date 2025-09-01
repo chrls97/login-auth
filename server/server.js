@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT  || 4000;
 connectDb()
 
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || ['http://localhost:5173']
+const allowedOrigins = process.env.FRONTEND_URL;
 
 app.use(express.json())
 app.use(cookieParser());
