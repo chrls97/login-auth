@@ -7,6 +7,7 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) =>{
 
+  axios.defaults.baseURL = "https://mern-auth-zeta-plum.vercel.app";
   axios.defaults.withCredentials=true;
 
   const navigate = useNavigate();
